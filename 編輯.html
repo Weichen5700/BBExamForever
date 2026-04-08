@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>題目逐題審閱系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['"Noto Sans TC"', 'sans-serif'] },
+          }
+        }
+      }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 to-teal-100 min-h-screen p-5">
+
+<div class="max-w-5xl mx-auto">
+    <!-- 頂部狀態列 -->
+    <div class="bg-white border-2 border-slate-300 rounded-xl shadow-sm p-4 mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="text-slate-700 font-medium">當前題號/總題數: <span id="current-question" class="text-rose-700 font-bold text-lg"></span>/<span id="total-questions" class="font-bold text-lg"></span></p>
+            <p class="text-slate-700 font-medium">主題: <span id="theme" class="text-indigo-600 font-bold"></span></p>
+        </div>
+    </div>
+
+    <!-- 題目內容區 -->
+    <div id="question-container">
+        <!-- 題目內容會在這裡顯示 -->
+    </div>
+
+    <!-- 上下題按鈕 -->
+    <div class="flex justify-between mb-3">
+        <button class="px-6 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-lg shadow transition" onclick="prevQuestion()">上一題</button>
+        <button class="px-6 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-lg shadow transition" onclick="nextQuestion()">下一題</button>
+    </div>
+
+    <!-- 底部題號資訊 -->
+    <p class="text-slate-600 font-medium text-center">當前題號/總題數: <span id="current-question2" class="text-rose-700 font-bold"></span>/<span id="total-questions2" class="font-bold"></span></p>
+
+    <!-- 跳題 -->
+    <div class="flex items-center justify-center gap-3 my-4">
+        <label for="jump-input" class="text-slate-700 font-medium">跳至題號：</label>
+        <input type="number" id="jump-input" placeholder="輸入題號" min="1" max="100" class="w-24 text-center border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        <button class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow transition" onclick="jumpToQuestion()">跳題</button>
+    </div>
+		
+    <!-- 類別統計 -->
+    <div class="bg-white border-2 border-slate-300 rounded-xl shadow-sm p-4 mt-4">
+        <h4 class="text-lg font-bold text-slate-700 mb-2">類別統計：</h4>
+        <div id="category-links" class="flex flex-wrap gap-2">
+            <!-- 類別統計連結將在此顯示 -->
+        </div>
+    </div>
+
+    <!-- 檔案操作 -->
+    <div class="bg-white border-2 border-slate-300 rounded-xl shadow-sm p-4 mt-4">
+        <input type="file" id="fileInput" accept=".txt" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-3" onchange="readFile()">
+        <button class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow transition" onclick="exportToTxt()">匯出成txt</button>
+    </div>
+</div>
+
+<script>
+// 存放題目資料
+let questions = [];
+let currentIndex = 0;
+
+// 讀取txt檔案並解析JSON
+function readFile() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const lines = event.target.result.split('\n');
+        questions = lines.map(line => {
+            const parsedLine = JSON.parse(line);
+            return {
+                sn: parsedLine.sn,
+                class: parsedLine.class,
+                question: parsedLine.question,
+                options: parsedLine.options,
+                remark: parsedLine.remark,
+                felo: parsedLine.felo || '',  // Default empty string if felo is missing
+                pic: parsedLine.pic || ''      // Default empty string if pic is missing
+            };
+        });
+        renderHeader();
+        renderQuestion();
+		 renderCategorySummary(); // 更新類別統計
+    };
+    reader.readAsText(file);
+}
+
+
+// 顯示主題與題目數量
+function renderHeader() {
+    document.getElementById('theme').textContent = '114年領組考題設定系統';
+    document.getElementById('total-questions').textContent = questions.length;
+    document.getElementById('current-question').textContent = currentIndex + 1;
+	   document.getElementById('total-questions2').textContent = questions.length;
+    document.getElementById('current-question2').textContent = currentIndex + 1;
+}
+
+// 顯示目前題目
+function renderQuestion() {
+    const questionContainer = document.getElementById('question-container');
+    questionContainer.innerHTML = '';
+
+    const q = questions[currentIndex];
+    let html = `<div class="bg-white border-2 border-slate-400 rounded-xl shadow-md p-6 mb-5 relative">
+        <!-- 右上角操作按鈕 -->
+        <div class="absolute top-3 right-3 flex gap-2">
+            <button class="px-4 py-1.5 bg-red-500 hover:bg-red-400 text-white font-bold rounded-lg text-sm shadow transition" onclick="deleteQuestion()">刪除</button>
+            <button class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-lg text-sm shadow transition" onclick="addNewQuestion()">新增</button>
+        </div>
+
+        <h3 class="text-xl font-bold text-indigo-700 mb-4">題目 ${q.sn}</h3>
+
+        <!-- 類別 -->
+        <div class="border border-slate-200 rounded-lg p-3 mb-3">
+            <label class="block text-sm font-semibold text-slate-500 mb-1">類別</label>
+            <input type="text" value="${q.class}" id="class" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        </div>
+
+        <!-- 題目 -->
+        <div class="border border-slate-200 rounded-lg p-3 mb-3">
+            <label class="block text-sm font-semibold text-slate-500 mb-1">題目內容</label>
+            <textarea id="question" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">${q.question}</textarea>
+        </div>
+
+        <!-- 選項區 -->
+        <div class="border border-slate-200 rounded-lg p-3 mb-3">
+            <label class="block text-sm font-semibold text-slate-500 mb-2">選項</label>`;
+
+    q.options.forEach((opt, optIndex) => {
+        html += `<div class="flex items-center gap-3 border-b border-slate-100 py-2 last:border-b-0">
+            <input type="checkbox" ${opt.answer ? 'checked' : ''} id="answer-${optIndex}" class="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+            <span class="text-sm font-medium text-slate-500 shrink-0">選項 ${optIndex + 1}:</span>
+            <input type="text" value="${opt.option}" id="option-${optIndex}" class="flex-1 px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        </div>`;
+    });
+
+    html += `</div>
+
+        <!-- 備註 -->
+        <div class="border border-slate-200 rounded-lg p-3 mb-3">
+            <label class="block text-sm font-semibold text-slate-500 mb-1">備註</label>
+            <input type="text" value="${q.remark}" id="remark" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        </div>
+        
+        <!-- 難度 / 標記按鈕 -->
+        <div class="flex flex-wrap gap-2 mb-3">
+            <button class="px-3 py-1.5 bg-gradient-to-r from-orange-400 to-amber-300 text-white font-bold rounded-lg text-sm shadow hover:from-amber-300 hover:to-orange-400 transition" onclick="fillFelo(0)">答對 (0次錯誤)</button>
+            <button class="px-3 py-1.5 bg-gradient-to-r from-orange-400 to-amber-300 text-white font-bold rounded-lg text-sm shadow hover:from-amber-300 hover:to-orange-400 transition" onclick="fillFelo(1)">答錯一次</button>
+            <button class="px-3 py-1.5 bg-gradient-to-r from-orange-400 to-amber-300 text-white font-bold rounded-lg text-sm shadow hover:from-amber-300 hover:to-orange-400 transition" onclick="fillFelo(2)">答錯二次</button>
+            <button class="px-3 py-1.5 bg-gradient-to-r from-orange-400 to-amber-300 text-white font-bold rounded-lg text-sm shadow hover:from-amber-300 hover:to-orange-400 transition" onclick="fillFelo(3)">答錯三次</button>
+            <button class="px-3 py-1.5 bg-gradient-to-r from-orange-400 to-amber-300 text-white font-bold rounded-lg text-sm shadow hover:from-amber-300 hover:to-orange-400 transition" onclick="fillFelo(4)">答錯4次或更多</button>
+            <span class="border-l border-slate-300 mx-1"></span>
+            <button class="px-3 py-1.5 bg-gradient-to-r from-orange-400 to-amber-300 text-white font-bold rounded-lg text-sm shadow hover:from-amber-300 hover:to-orange-400 transition" onclick="appendFeloContent('時間期限')">時間期限</button>
+            <button class="px-3 py-1.5 bg-gradient-to-r from-orange-400 to-amber-300 text-white font-bold rounded-lg text-sm shadow hover:from-amber-300 hover:to-orange-400 transition" onclick="appendFeloContent('報表電文')">報表電文</button>
+            <button class="px-3 py-1.5 bg-gradient-to-r from-orange-400 to-amber-300 text-white font-bold rounded-lg text-sm shadow hover:from-amber-300 hover:to-orange-400 transition" onclick="appendFeloContent('諧音')">諧音</button>
+        </div>
+
+        <!-- Felo 筆記 -->
+        <div class="border border-slate-200 rounded-lg p-3 mb-3">
+            <label class="block text-sm font-semibold text-slate-500 mb-1">Felo區塊 (寫自己的觀點，或是網路查詢的結果)</label>
+            <textarea id="felo" rows="4" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="1. 難度:一~三顆星，(時間期限)(為真)(皆是)&#10;2. 這題的思考: 直觀有印象的文字&#10;3. 補充資料: 網路上的資料">${q.felo || ''}</textarea>
+        </div>
+        
+        <!-- Pic 圖片 -->
+        <div class="border border-slate-200 rounded-lg p-3 mb-4">
+            <label class="block text-sm font-semibold text-slate-500 mb-1">Pic區塊 (寫URL，最多三張圖，用逗號分開)</label>
+            <textarea id="pic" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="請輸入圖片的 URL，用逗號分隔">${q.pic || ''}</textarea>
+        </div>
+        
+        <!-- 保存按鈕 -->
+        <button class="px-6 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-lg shadow transition" onclick="saveQuestion()">保存</button>
+    </div>`;
+
+    questionContainer.innerHTML = html;
+    updateCurrentQuestionDisplay(); // 更新當前題號顯示
+}
+
+
+
+// 保存當前題目的修改
+function saveQuestion() {
+    const classText = document.getElementById('class').value;
+    const questionText = document.getElementById('question').value;
+    const remarkText = document.getElementById('remark').value;
+    const feloText = document.getElementById('felo').value;
+    const picText = document.getElementById('pic').value;
+
+    const updatedOptions = questions[currentIndex].options.map((opt, optIndex) => {
+        return {
+            option: document.getElementById(`option-${optIndex}`).value,
+            answer: document.getElementById(`answer-${optIndex}`).checked
+        };
+    });
+
+    questions[currentIndex].class = classText;
+    questions[currentIndex].question = questionText;
+    questions[currentIndex].remark = remarkText;
+    questions[currentIndex].felo = feloText;
+    questions[currentIndex].pic = picText;
+    questions[currentIndex].options = updatedOptions;
+
+    alert('題目已保存');
+}
+
+
+// 切換到上一題
+function prevQuestion() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+    } else {
+        alert('這是第一題');
+    }
+}
+
+// 切換到下一題
+function nextQuestion() {
+    if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+    } else {
+        alert('這是最後一題');
+    }
+}
+
+// 跳轉至指定題目
+function jumpToQuestion() {
+    const jumpInput = document.getElementById('jump-input').value;
+    const jumpIndex = parseInt(jumpInput, 10) - 1;
+
+    if (jumpIndex >= 0 && jumpIndex < questions.length) {
+        currentIndex = jumpIndex;
+        renderQuestion();
+    } else {
+        alert('無效的題號');
+    }
+}
+
+// 監聽 Enter 鍵
+document.getElementById('jump-input').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        jumpToQuestion();
+    }
+});
+
+// 更新當前題號顯示
+function updateCurrentQuestionDisplay() {
+    document.getElementById('current-question').textContent = currentIndex + 1;
+	document.getElementById('current-question2').textContent = currentIndex + 1;
+}
+
+// 刪除當前題目
+function deleteQuestion() {
+    if (confirm('確定要刪除這題嗎？')) {
+        const currentClass = questions[currentIndex].class; // 獲取當前題目的類別
+        questions.splice(currentIndex, 1); // 刪除當前題目
+
+        // 如果刪除後當前題目位置超出範圍，將 currentIndex 調整到最後一題
+        if (currentIndex >= questions.length) {
+            currentIndex = questions.length - 1;
+        }
+
+        // 只更新相同類別的題目編號
+        updateSnForClass(currentClass);
+        renderHeader();
+        renderQuestion();
+		  renderCategorySummary(); // 更新類別統計
+    }
+}
+
+// 新增一個新題目並插入到當前題目後
+function addNewQuestion() {
+    const newQuestion = {
+        "class": questions[currentIndex].class,  // 保持同類別
+        "sn": "",  // 先不設置題號，稍後更新
+        "type": "Single",
+        "question": "",
+        "options": [
+            {"option": "", "answer": false},
+            {"option": "", "answer": false},
+            {"option": "", "answer": false
+            }
+        ],
+        "remark": ""
+    };
+    
+    // 插入新題目到當前題目後面
+    questions.splice(currentIndex + 1, 0, newQuestion);
+    currentIndex++;
+    
+    // 更新題號，只更新同一類別的題目
+    updateSnForClass(questions[currentIndex].class);
+    renderHeader();
+    renderQuestion();
+	 renderCategorySummary(); // 更新類別統計
+}
+
+// 只更新同一類別的題號
+
+function updateSnForClass(category) {
+    let counter = 1;
+    for (let i = 0; i < questions.length; i++) {
+        if (questions[i].class === category) {
+            questions[i].sn = counter.toString().padStart(3, '0');
+            counter++;
+        }
+    }
+}
+
+// 匯出為符合原始格式的txt
+function exportToTxt() {
+    const result = questions.map(q => JSON.stringify({
+        sn: q.sn,
+        class: q.class,
+        question: q.question,
+        options: q.options,
+        remark: q.remark,
+        felo: q.felo,
+        pic: q.pic
+    })).join('\n');
+    
+    const blob = new Blob([result], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'questions.txt';
+    link.click();
+}
+
+// 鍵盤事件監聽
+document.addEventListener('keydown', function(event) {
+    switch (event.key) {
+        case 'PageUp':               
+            prevQuestion();
+            break;
+        case 'PageDown':               
+            nextQuestion();
+            break;
+        default:
+            break;
+    }
+});
+
+function fillFelo(mistakeCount) {
+    const feloTextarea = document.getElementById('felo');
+    let feedback = '';
+
+    // 根據答錯次數設定內容
+    if (mistakeCount === 0) {
+        feedback = '零次答錯：恭喜全對！';
+    } else if (mistakeCount === 1) {
+        feedback = '一顆星：答錯一次';
+    } else if (mistakeCount === 2) {
+        feedback = '二顆星：答錯二次';
+    } else if (mistakeCount === 3) {
+        feedback = '三顆星：答錯三次';
+    } else if (mistakeCount >= 4) {
+        feedback = '四顆星以上：多次答錯';
+    }
+
+    // 填入 felo 區塊的內容
+    feloTextarea.value = `1. ${feedback}\n2. key: \n3. felo: `;
+}
+
+function appendFeloContent(content) {
+    const feloTextarea = document.getElementById('felo');
+    const existingContent = feloTextarea.value;
+
+    // 檢查是否已經有答錯次數的內容
+    if (!existingContent.includes('答錯')) {
+        alert('請先選擇答錯次數！');
+        return;
+    }
+
+    // 找到答錯次數的部分，並追加內容
+    const baseText = existingContent.split('：')[0]; // 提取「1. 答錯N次」部分
+    let additionalContent = existingContent.split('：')[1] || ''; // 提取後續內容
+    additionalContent = additionalContent.trim();
+
+    // 防止重複追加
+    if (additionalContent.includes(content)) {
+        alert(`${content} 已經存在於內容中！`);
+        return;
+    }
+
+    // 更新內容，用逗號分隔追加
+    const newContent = additionalContent ? `${additionalContent}, ${content}` : content;
+    feloTextarea.value = `${baseText}：${newContent}`;
+}
+
+function renderCategorySummary() {
+    const categoryLinks = document.getElementById('category-links');
+
+    // 如果 category-links 元素不存在，停止執行
+    if (!categoryLinks) {
+        console.error('Element with id "category-links" not found');
+        return;
+    }
+
+    categoryLinks.innerHTML = ''; // 清空現有內容
+
+    // 使用 Map 統計每個類別的題數
+    const categoryCount = new Map();
+    questions.forEach(q => {
+        if (categoryCount.has(q.class)) {
+            categoryCount.set(q.class, categoryCount.get(q.class) + 1);
+        } else {
+            categoryCount.set(q.class, 1);
+        }
+    });
+
+    // 動態生成類別統計列表
+    Array.from(categoryCount.entries()).forEach(([category, count]) => {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = `${category} (${count}題)`;
+        link.className = 'inline-block px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm font-medium hover:bg-indigo-100 transition cursor-pointer';
+        link.addEventListener('click', (e) => { e.preventDefault(); jumpToCategory(category); });
+        categoryLinks.appendChild(link);
+    });
+}
+
+
+// 新增跳轉到類別的功能
+function jumpToCategory(targetClass) {
+    // 找到第一個符合類別的題目
+    const targetIndex = questions.findIndex(q => q.class === targetClass);
+    if (targetIndex !== -1) {
+        currentIndex = targetIndex; // 更新當前題目索引
+        renderQuestion(); // 渲染該題目
+    } else {
+        alert(`找不到類別 ${targetClass} 的題目`);
+    }
+}
+
+</script>
+
+</body>
+</html>

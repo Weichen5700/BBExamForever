@@ -1,0 +1,11 @@
+{
+  "name": "investment-exam-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "convert:investment": "node tools/convert-investment-pdf.mjs"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^5.4.296"
+  }
+}

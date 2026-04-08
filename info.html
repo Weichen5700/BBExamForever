@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>證照考試工具 - 起始頁面</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(45deg, #dcedc8, #b2dfdb);
+            background-size: 150% 150%;
+            animation: gradientBG 60s ease infinite;
+            margin: 0;
+            padding: 1.5rem;
+            min-height: 100vh;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .start-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 0.9375rem;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+
+        /* 第一個區塊：按鈕 */
+        .button-section {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .img-button {
+            width: 250px;
+            height: 120px;
+            border: none;
+            border-radius: 0.3125rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .img-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(74, 144, 226, 0.5), rgba(53, 122, 189, 0.5));
+            z-index: 1;
+        }
+
+        .img-button span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            z-index: 2;
+            text-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.5);
+        }
+
+        .img-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+            filter: brightness(1.1);
+        }
+
+        #reviewbtn {
+           background-image: none;
+			background-color: #9EB7DC;
+        }
+		
+
+        #exambtn {
+            background-image: none;
+			background-color: #9EB7DC;
+        }
+
+        /* 第二個區塊：工具使用說明 */
+        .text-box {
+            text-align: left;
+        }
+
+        /* 第三個區塊：圖片 */
+        .image-section {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .image-wrapper {
+            display: inline-block;
+            width: 30%;
+            max-width: 400px;
+            margin: 0 10px;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+             height: 200px; /* ← 統一高度 */
+            object-fit: contain;
+            border-radius: 0.3125rem;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .image-wrapper:hover img {
+            transform: scale(1.1);
+        }
+
+        /* 第四個區塊：公告 */
+        .announcement-section {
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .announcement-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .new-tag {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 1.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* RWD 調整 */
+        @media (max-width: 768px) {
+            .start-page {
+                padding: 1rem;
+            }
+
+            .section {
+                padding: 1rem;
+            }
+
+            .button-section {
+                gap: 10px;
+            }
+
+            .img-button {
+                width: 180px;
+                height: 90px;
+            }
+
+            .img-button span {
+                font-size: 1.2rem;
+            }
+
+            .image-wrapper {
+                width: 100%;
+                max-width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .announcement-section {
+                max-height: 200px;
+            }
+        }
+
+        /* 模態框樣式調整 */
+        .modal-content {
+            background: rgba(0, 0, 0, 0.9); /* 半透明黑色背景 */
+            border: none;
+            position: relative; /* 確保關閉按鈕相對定位 */
+            height: 100%; /* 確保模態框填充全屏 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .modal-img {
+            max-width: 100%;
+            max-height: 90vh; /* 留出空間給關閉按鈕 */
+            object-fit: contain;
+            margin: auto;
+            display: block;
+        }
+
+        .close-btn {
+            position: absolute;
+            bottom: 20px; /* 移到中間下方 */
+            left: 50%;
+            transform: translateX(-50%); /* 水平居中 */
+            font-size: 2rem; /* 放大字體 */
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 50%;
+            width: 60px; /* 放大按鈕 */
+            height: 60px; /* 放大按鈕 */
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        /* 確保點擊模態框邊緣空白處關閉 */
+        .modal-backdrop {
+            z-index: 1040; /* 確保在最上層 */
+        }
+
+        /* 手機版特殊調整 */
+        @media (max-width: 768px) {
+            .close-btn {
+                width: 50px; /* 手機版略微縮小 */
+                height: 50px;
+                font-size: 1.5rem; /* 縮小字體 */
+                bottom: 15px;
+            }
+
+            .modal-img {
+                max-height: 85vh; /* 手機版留出更多空間給按鈕 */
+            }
+        }
+		#examPlan {
+    background-image: none; /* 移除原有的背景圖片 */
+    background-color: #ff6f61; /* 設定顯眼的珊瑚紅背景 */
+}
+
+.image-wrapper a {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: #0077cc;
+}
+
+.image-wrapper a:hover {
+    text-decoration: underline;
+    color: #005fa3;
+}
+
+#examALL {
+    background-image: none;
+    background-color: #ff6f61;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container start-page">
+        <h1>證照考試工具</h1>
+
+        <!-- 第一個區塊：按鈕 -->
+        <div class="section button-section">
+            <button id="reviewbtn" class="img-button" onclick="startReview()">
+                <span>試題總覽</span>
+            </button>
+            <button id="exambtn" class="img-button" onclick="startExam()">
+                <span>模擬考試</span>
+            </button>
+            <button id="examPlan" class="img-button" onclick="startPlan()">
+                <span>讀書計畫</span>
+            </button>
+			 <button id="examALL" class="img-button" onclick="examALL()">
+                <span>題目答案版</span>
+            </button>
+        </div>
+
+        <!-- 第四個區塊：公告 -->
+        <div class="section announcement-section">
+            <h2>最新公告</h2>
+            <div class="announcement-item"><span class="new-tag">NEW</span>2025年2月25日：做最後一次的校稿</div>
+            <div class="announcement-item">2025年2月20日：系統更新，新增夜間模式功能。</div>
+            <div class="announcement-item">工具只為了來驗證書的方法，四個區塊(1.題目 2.答案 3.文字IP 4.圖像)。</div>
+        </div>
+
+        <!-- 第三個區塊：圖片 -->
+        <div class="section image-section">
+            <div class="image-wrapper">
+                <img src="./img/cover.jpg" alt="工具圖片 1">
+            </div>
+            <div class="image-wrapper">
+                <img src="./img/way1.jpg" alt="工具圖片 2">
+            </div>
+            <div class="image-wrapper">
+                <img src="./img/way2.jpg" alt="工具圖片 3">
+            </div>
+        </div>
+
+        <!-- 第五個區塊：參考資源 -->
+        <div class="section image-section">
+            <div class="image-wrapper text-center">
+                <img src="./img/learnway.jpg" alt="天才的學習方法">
+                <div class="mt-2">
+                    <a href="https://weichen5700.github.io/LeaderExamination/天才的學習方法%20-%20朱利奧·迪安杰里.html" target="_blank">
+                        🔗 天才的學習方法 - 朱利奧·迪安杰里
+                    </a>
+                </div>
+            </div>
+            <div class="image-wrapper text-center">
+                <img src="./img/notebooklm.jpg" alt="notebooklm">
+                <div class="mt-2">
+                    <a href="https://notebooklm.google.com/notebook/2127b075-1abb-4bac-9983-b866d45ca0a3" target="_blank">
+                        🔗 NotebookLLM 使用說明
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 圖片全屏模態框 -->
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <button type="button" class="close-btn" data-bs-dismiss="modal">×</button>
+                <img src="" class="img-fluid modal-img" alt="Large Image">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function startReview() {
+            window.location.href = './複習.html';
+        }
+
+        function startExam() {
+            window.location.href = './考試.html';
+        }
+
+        function startPlan() {
+            window.location.href = './複習計畫.html';
+        }
+		function examALL() {
+            window.location.href = './output.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var images = document.querySelectorAll('.image-section img');
+            var modal = document.getElementById('imageModal');
+            var modalImg = modal.querySelector('img');
+
+            images.forEach(function (img) {
+                img.addEventListener('click', function () {
+                    modalImg.src = this.src;
+                    var myModal = new bootstrap.Modal(modal);
+                    myModal.show();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

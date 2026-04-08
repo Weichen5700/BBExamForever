@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>複習計畫表 (1111原則 + 題號) - 100% 成就升級版</title>
+  <style>
+    body {
+      font-family: "微軟正黑體", Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .input-section {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .input-group {
+      flex: 1;
+      min-width: 250px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 0 auto;
+      background: #fff;
+      width: 100%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background: #4CAF50;
+      color: #fff;
+      position: sticky;
+      top: 0;
+    }
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+    .checkbox-col {
+      width: 50px;
+    }
+    .progress-container {
+      margin: 20px 0;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .progress-bar {
+      height: 20px;
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #4CAF50;
+      transition: width 0.5s;
+    }
+    /* 新增 100% 成就效果 */
+    .progress-fill.complete {
+      background: linear-gradient(45deg, #FFD700, #FF8C00);
+      animation: sparkle 1s infinite alternate;
+    }
+    @keyframes sparkle {
+      from { filter: brightness(1); }
+      to { filter: brightness(1.3); }
+    }
+    .progress-text {
+      text-align: center;
+      margin-top: 5px;
+      font-weight: bold;
+    }
+    .alert {
+      padding: 10px;
+      background-color: #f44336;
+      color: white;
+      margin-top: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+    .table-container {
+      max-height: 600px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+    .summary {
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .summary-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #2c3e50;
+    }
+    .summary-content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 15px;
+    }
+    .summary-item {
+      flex: 1;
+      min-width: 200px;
+    }
+    .principle-container {
+      background: #f9f9f9;
+      border-left: 4px solid #4CAF50;
+      padding: 10px 15px;
+      margin-top: 10px;
+      border-radius: 0 4px 4px 0;
+    }
+    .principle-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #2c3e50;
+    }
+    .principle-list {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .principle-list li {
+      margin-bottom: 8px;
+    }
+    .revision-stats {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    @media print {
+      .input-section, button, .progress-container {
+        display: none;
+      }
+      body {
+        background: white;
+        padding: 0;
+      }
+      .table-container {
+        max-height: none;
+        overflow: visible;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>自適應複習計畫表 (強化 1111原則 + 題號)</h1>
+  
+  <div class="input-section">
+    <div class="input-row">
+      <div class="input-group">
+        <label for="total-questions">題庫總題數:</label>
+        <input type="number" id="total-questions" min="1" value="1220">
+      </div>
+      <div class="input-group">
+        <label for="days-left">距離考試剩餘天數:</label>
+        <input type="number" id="days-left" min="1" value="30">
+      </div>
+    </div>
+    <div class="alert" id="alert-message">錯誤訊息顯示區</div>
+    <button id="generate-plan">產生複習計畫</button>
+    <button id="reset-progress">重設進度</button>
+	  <button id="Returninfo" onclick="Returninfo()">返回</button>
+  </div>
+  
+  <div class="summary" id="plan-summary">
+    <div class="summary-title">計畫概要</div>
+    <div class="summary-content">
+      <div class="summary-item">總題數: <span id="summary-total-questions">0</span> 題</div>
+      <div class="summary-item">學習天數: <span id="summary-days">0</span> 天</div>
+      <div class="summary-item">每日平均: <span id="summary-per-day">0</span> 題</div>
+      <div class="summary-item">每題複習次數: <span id="summary-reviews">0</span> 次</div>
+    </div>
+    
+    <div class="principle-container">
+      <div class="principle-title">複習原則說明 (強化1111原則)</div>
+      <ul class="principle-list">
+        <li><strong>首次學習</strong>: 第一次見到新題目並學習</li>
+        <li><strong>隔天複習</strong>: 在學習新題目的隔天進行第一次複習</li>
+        <li><strong>一週複習</strong>: 在首次學習後的7天進行第二次複習</li>
+        <li><strong>最後統整</strong>: 在考試前一天進行最後的綜合複習</li>
+        <li><strong>強化複習</strong>: 本計畫確保每題至少經過4次複習，幫助長期記憶</li>
+      </ul>
+      <div class="revision-stats" id="revision-stats">
+        <!-- 複習統計資訊會由 JavaScript 動態生成 -->
+      </div>
+    </div>
+  </div>
+  
+  <div class="progress-container">
+    <h3>學習進度</h3>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-text" id="progress-text">0%</div>
+  </div>
+  
+  <div class="table-container">
+    <table id="plan-table">
+      <thead>
+        <tr>
+          <th class="checkbox-col">完成</th>
+          <th>天數</th>
+          <th>新題數量及題號</th>
+          <th>隔天複習(題號)</th>
+          <th>一週複習(題號)</th>
+          <th>月複習/額外複習(題號)</th>
+          <th>最後／綜合複習(題號)</th>
+        </tr>
+      </thead>
+      <tbody id="plan-body">
+        <!-- 表格內容將由 JavaScript 動態生成 -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const totalQuestionsInput = document.getElementById("total-questions");
+      const daysLeftInput = document.getElementById("days-left");
+      const generatePlanBtn = document.getElementById("generate-plan");
+      const resetProgressBtn = document.getElementById("reset-progress");
+      const planBody = document.getElementById("plan-body");
+      const progressFill = document.getElementById("progress-fill");
+      const progressText = document.getElementById("progress-text");
+      const alertMessage = document.getElementById("alert-message");
+      const summaryTotalQuestions = document.getElementById("summary-total-questions");
+      const summaryDays = document.getElementById("summary-days");
+      const summaryPerDay = document.getElementById("summary-per-day");
+      const summaryReviews = document.getElementById("summary-reviews");
+      const revisionStats = document.getElementById("revision-stats");
+      
+      // 載入儲存的輸入值（如果有）
+      if (localStorage.getItem("total-questions")) {
+        totalQuestionsInput.value = localStorage.getItem("total-questions");
+      }
+      if (localStorage.getItem("days-left")) {
+        daysLeftInput.value = localStorage.getItem("days-left");
+      }
+      
+      function generatePlan() {
+        const totalQuestions = parseInt(totalQuestionsInput.value);
+        const daysLeft = parseInt(daysLeftInput.value);
+        
+        if (isNaN(totalQuestions) || totalQuestions <= 0) {
+          showAlert("請輸入有效的題庫總題數");
+          return;
+        }
+        
+        if (isNaN(daysLeft) || daysLeft <= 0) {
+          showAlert("請輸入有效的剩餘天數");
+          return;
+        }
+        
+        if (daysLeft < 8) {
+          showAlert("為了有效複習，建議至少需要8天的學習時間");
+        }
+        hideAlert();
+        
+        localStorage.setItem("total-questions", totalQuestions);
+        localStorage.setItem("days-left", daysLeft);
+        
+        planBody.innerHTML = "";
+        
+        // 前70%的天數安排新題學習
+        const learningDays = Math.floor(daysLeft * 0.7);
+        let questionsPerDay = Math.ceil(totalQuestions / learningDays);
+        
+        // 初始化每題複習次數（不含首次學習）
+        let reviewMap = {};
+        for (let i = 1; i <= totalQuestions; i++) {
+          reviewMap[i] = 0;
+        }
+        
+        summaryTotalQuestions.textContent = totalQuestions;
+        summaryDays.textContent = daysLeft;
+        summaryPerDay.textContent = questionsPerDay;
+        
+        let allDaysQuestions = [];
+        let currentQuestion = 1;
+        
+        // 第一階段：分配新題目
+        for (let day = 1; day <= daysLeft; day++) {
+          if (currentQuestion > totalQuestions || day > learningDays) {
+            allDaysQuestions.push({
+              day: day,
+              startQ: 0,
+              endQ: 0,
+              count: 0,
+              nextDayReview: [],
+              weekReview: [],
+              monthReview: [],
+              finalReview: []
+            });
+          } else {
+            const dayStartQ = currentQuestion;
+            let dayEndQ = Math.min(currentQuestion + questionsPerDay - 1, totalQuestions);
+            allDaysQuestions.push({
+              day: day,
+              startQ: dayStartQ,
+              endQ: dayEndQ,
+              count: dayEndQ - dayStartQ + 1,
+              nextDayReview: [],
+              weekReview: [],
+              monthReview: [],
+              finalReview: []
+            });
+            currentQuestion = dayEndQ + 1;
+          }
+        }
+        
+        // 第二階段：分配隔天、一週、月/額外複習
+        for (let i = 0; i < allDaysQuestions.length; i++) {
+          const dayData = allDaysQuestions[i];
+          
+          // 隔天複習
+          if (i > 0) {
+            const prevDay = allDaysQuestions[i-1];
+            if (prevDay.count > 0) {
+              dayData.nextDayReview = [prevDay.startQ, prevDay.endQ];
+              for (let q = prevDay.startQ; q <= prevDay.endQ; q++) {
+                if (q <= totalQuestions) reviewMap[q]++;
+              }
+            }
+          }
+          
+          // 一週複習
+          if (i >= 7) {
+            const weekDay = allDaysQuestions[i-7];
+            if (weekDay.count > 0) {
+              dayData.weekReview = [weekDay.startQ, weekDay.endQ];
+              for (let q = weekDay.startQ; q <= weekDay.endQ; q++) {
+                if (q <= totalQuestions) reviewMap[q]++;
+              }
+            }
+          }
+          
+          // 月複習/額外複習
+          if (i >= 14 && i < daysLeft - 1) {
+            let needsMoreReview = [];
+            let batchStart = null;
+            let batchEnd = null;
+            
+            for (let q = 1; q <= Math.min(allDaysQuestions[i-14].endQ, totalQuestions); q++) {
+              if (reviewMap[q] < 2) {
+                if (batchStart === null) batchStart = q;
+                batchEnd = q;
+              } else if (batchStart !== null) {
+                needsMoreReview.push([batchStart, batchEnd]);
+                batchStart = null;
+              }
+            }
+            if (batchStart !== null) {
+              needsMoreReview.push([batchStart, batchEnd]);
+            }
+            
+            if (needsMoreReview.length > 0) {
+              let totalToReview = 0;
+              let batchToUse = [];
+              
+              for (let batch of needsMoreReview) {
+                let batchSize = batch[1] - batch[0] + 1;
+                if (totalToReview + batchSize <= 50) {
+                  batchToUse.push(batch);
+                  totalToReview += batchSize;
+                  for (let q = batch[0]; q <= batch[1]; q++) {
+                    if (q <= totalQuestions) reviewMap[q]++;
+                  }
+                } else {
+                  break;
+                }
+              }
+              
+              if (batchToUse.length > 0) {
+                dayData.monthReview = batchToUse;
+              }
+            }
+          }
+          // ※ 原本的最後複習區塊已移除
+        }
+        
+        // 第三階段：將尚未達到 4 次複習（初次學習+3次複習）的題目，
+        // 均攤至學習期結束後的天數中（避免考前大補漏）
+        let pendingFinal = [];
+        for (let q = 1; q <= totalQuestions; q++) {
+          if (reviewMap[q] < 3) {
+            pendingFinal.push(q);
+          }
+        }
+        let finalReviewDays = daysLeft - learningDays;
+        if (finalReviewDays < 1) finalReviewDays = 1;
+        // 將 pendingFinal 分批（平均每天分配一個批次）
+        let chunkSize = Math.ceil(pendingFinal.length / finalReviewDays);
+        for (let j = 0; j < finalReviewDays; j++) {
+          let chunk = pendingFinal.slice(j * chunkSize, (j+1) * chunkSize);
+          if (chunk.length > 0) {
+            allDaysQuestions[learningDays + j].finalReview = chunk;
+            chunk.forEach(q => {
+              if (q <= totalQuestions) reviewMap[q]++;
+            });
+          }
+        }
+        
+        // 將每天的 finalReview 題號以 groupRanges 轉換（只做排序與合併連續數字）
+        function groupRanges(arr) {
+          if (arr.length === 0) return [];
+          arr.sort((a, b) => a - b);
+          let ranges = [];
+          let start = arr[0], end = arr[0];
+          for (let i = 1; i < arr.length; i++) {
+            if (arr[i] === end + 1) {
+              end = arr[i];
+            } else {
+              ranges.push([start, end]);
+              start = arr[i];
+              end = arr[i];
+            }
+          }
+          ranges.push([start, end]);
+          return ranges;
+        }
+        for (let i = 0; i < allDaysQuestions.length; i++) {
+          if (allDaysQuestions[i].finalReview && allDaysQuestions[i].finalReview.length > 0) {
+            allDaysQuestions[i].finalReview = groupRanges(allDaysQuestions[i].finalReview);
+          }
+        }
+        
+        // 計算平均複習次數
+        let totalReviews = 0;
+        let minReviews = 999;
+        let maxReviews = 0;
+        for (let q = 1; q <= totalQuestions; q++) {
+          const reviewCount = reviewMap[q] + 1;
+          totalReviews += reviewCount;
+          minReviews = Math.min(minReviews, reviewCount);
+          maxReviews = Math.max(maxReviews, reviewCount);
+        }
+        const avgReviews = (totalReviews / totalQuestions).toFixed(1);
+        summaryReviews.textContent = `${minReviews}-${maxReviews} (平均 ${avgReviews})`;
+        
+        // 複習統計資訊
+        let reviewDistribution = {};
+        for (let q = 1; q <= totalQuestions; q++) {
+          const count = reviewMap[q] + 1;
+          if (!reviewDistribution[count]) reviewDistribution[count] = 0;
+          reviewDistribution[count]++;
+        }
+        let statsHTML = `<strong>複習次數分佈:</strong><br>`;
+        for (let count = minReviews; count <= maxReviews; count++) {
+          const number = reviewDistribution[count] || 0;
+          const percentage = ((number / totalQuestions) * 100).toFixed(1);
+          statsHTML += `${count}次複習: ${number}題 (${percentage}%)<br>`;
+        }
+        revisionStats.innerHTML = statsHTML;
+        
+        // 生成表格行
+        planBody.innerHTML = "";
+        for (let i = 0; i < allDaysQuestions.length; i++) {
+          const dayData = allDaysQuestions[i];
+          const row = document.createElement("tr");
+          
+          let dayQuestions = dayData.count === 0 
+            ? "0 (複習)" 
+            : `${dayData.count} (${dayData.startQ}-${dayData.endQ})`;
+          
+          let nextDayReview = dayData.nextDayReview.length === 2 
+            ? `${dayData.nextDayReview[0]}-${dayData.nextDayReview[1]}` 
+            : "—";
+          
+          let weekReview = dayData.weekReview.length === 2 
+            ? `${dayData.weekReview[0]}-${dayData.weekReview[1]}` 
+            : "—";
+          
+          let monthReview = "—";
+          if (dayData.monthReview && dayData.monthReview.length > 0) {
+            monthReview = dayData.monthReview.map(batch => `${batch[0]}-${batch[1]}`).join(", ");
+          }
+          
+          let finalReviewDisplay = "";
+          if (dayData.finalReview && dayData.finalReview.length > 0) {
+            let groups = dayData.finalReview;
+            let totalFinalCount = groups.reduce((sum, g) => sum + (g[1] - g[0] + 1), 0);
+            if (groups.length > 5) {
+              finalReviewDisplay = `共 ${totalFinalCount} 題 (首: ${groups[0][0]}-${groups[0][1]}, 尾: ${groups[groups.length-1][0]}-${groups[groups.length-1][1]})`;
+            } else {
+              finalReviewDisplay = groups.map(group => {
+                return group[0] === group[1] ? `${group[0]}` : `${group[0]}-${group[1]}`;
+              }).join(", ");
+            }
+          } else {
+            finalReviewDisplay = "—";
+          }
+          
+          row.innerHTML = `
+            <td><input type="checkbox" id="day-${dayData.day}" ${localStorage.getItem(`day-${dayData.day}`) === "true" ? "checked" : ""}></td>
+            <td>${dayData.day}</td>
+            <td>${dayQuestions}</td>
+            <td>${nextDayReview}</td>
+            <td>${weekReview}</td>
+            <td>${monthReview}</td>
+            <td>${finalReviewDisplay}</td>
+          `;
+          planBody.appendChild(row);
+          
+          const checkbox = row.querySelector(`#day-${dayData.day}`);
+          checkbox.addEventListener("change", function() {
+            localStorage.setItem(`day-${dayData.day}`, checkbox.checked);
+            updateProgress();
+          });
+        }
+        
+        updateProgress();
+      }
+      
+      function updateProgress() {
+        const daysLeft = parseInt(daysLeftInput.value);
+        let completedDays = 0;
+        for (let day = 1; day <= daysLeft; day++) {
+          const checkbox = document.getElementById(`day-${day}`);
+          if (checkbox && checkbox.checked) {
+            completedDays++;
+          }
+        }
+        const progressPercentage = daysLeft > 0 ? (completedDays / daysLeft) * 100 : 0;
+        progressFill.style.width = `${progressPercentage}%`;
+        
+        // 當達到 100% 時，加入炫目的成就效果
+        if (Math.round(progressPercentage) === 100) {
+          progressFill.classList.add("complete");
+          progressText.textContent = `${completedDays} / ${daysLeft} 天 (100% 完成！你太厲害了！)`;
+          // 顯示成就彈窗
+          setTimeout(() => {
+            alert("100% 成就達成！恭喜你，這真是了不起的成就！");
+          }, 300);
+        } else {
+          progressFill.classList.remove("complete");
+          progressText.textContent = `${completedDays} / ${daysLeft} 天 (${Math.round(progressPercentage)}%)`;
+        }
+      }
+      
+      function showAlert(message) {
+        alertMessage.textContent = message;
+        alertMessage.style.display = "block";
+      }
+      
+      function hideAlert() {
+        alertMessage.style.display = "none";
+      }
+      
+      function resetProgress() {
+        const daysLeft = parseInt(daysLeftInput.value);
+        for (let day = 1; day <= daysLeft; day++) {
+          localStorage.removeItem(`day-${day}`);
+          const checkbox = document.getElementById(`day-${day}`);
+          if (checkbox) {
+            checkbox.checked = false;
+          }
+        }
+        updateProgress();
+      }
+      
+      generatePlanBtn.addEventListener("click", generatePlan);
+      resetProgressBtn.addEventListener("click", resetProgress);
+      
+      generatePlan();
+    });
+	
+	function Returninfo() {
+            window.location.href = 'https://weichen5700.github.io/LeaderExamination/info.html'; // 假設考試頁面命名為 exam.html
+        }
+
+
+  </script>
+</body>
+</html>

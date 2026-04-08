@@ -1,0 +1,225 @@
+/* ===== 考試頁面專用樣式 ===== */
+
+.section {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.75rem;
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* ── 設定步驟標題列 ── */
+.config-step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 1rem;
+  border-radius: 0.6rem 0.6rem 0 0;
+  margin-top: 1.25rem;
+  border-bottom: none;
+}
+.config-step-header:first-child { margin-top: 0; }
+.step-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: 9999px;
+  letter-spacing: 0.06em;
+  color: #fff;
+  white-space: nowrap;
+}
+.step-title { font-weight: 700; font-size: 1rem; }
+.step-desc { font-size: 0.8rem; color: #64748b; }
+
+/* ── 設定群組容器 ── */
+.config-group {
+  border-radius: 0 0 0.6rem 0.6rem;
+  padding: 0.75rem;
+  margin-bottom: 0;
+}
+.config-group .section { margin-bottom: 0; }
+
+/* ── STEP 1: 題庫範圍 — 綠色 ── */
+.scope-header { background-color: #f0fdf4; border: 2px solid #86efac; }
+.scope-header .step-badge { background-color: #16a34a; }
+.scope-header .step-title { color: #166534; }
+.scope-group { background-color: #f8fffe; border: 2px solid #86efac; border-top: none; }
+.scope-group .section { background-color: #ffffff; border-color: #86efac; }
+
+/* ── STEP 2: 條件過濾 — 琥珀色 ── */
+.filter-header { background-color: #fffbeb; border: 2px solid #fcd34d; }
+.filter-header .step-badge { background-color: #d97706; }
+.filter-header .step-title { color: #92400e; }
+.filter-group { background-color: #fffef5; border: 2px solid #fcd34d; border-top: none; }
+.filter-group .section { background-color: #ffffff; border-color: #fcd34d; }
+
+/* ── STEP 3: 出題設定 — 玫瑰色 ── */
+.options-header { background-color: #fff1f2; border: 2px solid #fda4af; }
+.options-header .step-badge { background-color: #e11d48; }
+.options-header .step-title { color: #9f1239; }
+.options-group { background-color: #fff8f9; border: 2px solid #fda4af; border-top: none; }
+.options-group .section { background-color: #ffffff; border-color: #fda4af; }
+
+/* ── col-md-4：三欄 ── */
+.col-md-4 { width: 100%; }
+@media (min-width: 768px) { .col-md-4 { width: 33.333%; } }
+
+h1, h5 { color: #1e293b; }
+
+#page-title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #9f1239;
+  font-weight: 700;
+}
+
+/* 題目容器 */
+#question-container {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-top: 0.75rem;
+  position: relative;
+}
+
+#question-block {
+  position: relative;
+  padding-bottom: 5rem;
+}
+
+/* 題號 */
+.question-sn { color: #7c3aed; font-weight: 600; }
+#question-title { color: #3b82f6; font-size: 1.6rem; margin-bottom: 1rem; }
+
+/* 選項 — 加入格線 */
+.option {
+  background-color: #ffffff;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+.option:hover {
+  background-color: #fef3c7;
+  border-color: #fbbf24;
+}
+
+/* 導覽按鈕 */
+.nav-buttons {
+  position: fixed;
+  bottom: 1rem;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 1000;
+}
+
+/* 計時器 */
+.timer-container { display: flex; align-items: center; gap: 0.5rem; }
+.end-test-btn { margin-top: 1.5rem; text-align: center; }
+
+/* 字體控制 */
+.font-controls { position: absolute; top: 0; right: 1rem; display: flex; gap: 0.5rem; }
+.font-btn {
+  width: 2rem; height: 2rem; border-radius: 9999px;
+  background-color: #3b82f6; color: white; border: none;
+  font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background-color 0.2s ease;
+}
+.font-btn:hover { background-color: #2563eb; }
+
+/* 進度 / 計時 */
+.progress, .timer {
+  font-size: 1.1rem; color: #334155; padding: 0.75rem;
+  background-color: #ffffff; border-radius: 0.5rem;
+  border: 1px solid #e2e8f0; text-align: center;
+}
+.horizontal-layout {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 1rem;
+}
+
+/* 圖表 / 成績 */
+.chart {
+  width: 100%; height: 20rem; max-height: 60vh;
+  background-color: #ffffff; padding: 1rem;
+  border-radius: 0.75rem; border: 2px solid #cbd5e1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.marquee-border {
+  padding: 1.5rem; border-radius: 0.75rem;
+  background-color: #ffffff; border: 2px solid #cbd5e1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* 題目總覽圓圈 */
+.question-circle {
+  display: inline-block; width: 20px; height: 20px;
+  margin: 3px; border-radius: 50%; cursor: pointer;
+  border: 1px solid #cbd5e1;
+}
+
+/* 備註 / felo 區塊 */
+.remark-block {
+  border-left: 4px solid #7c3aed;
+  background-color: #faf5ff;
+  padding: 1.25rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin-top: 0.75rem;
+}
+.felo-block {
+  border-left: 4px solid #06b6d4;
+  background-color: #ecfeff;
+  padding: 1.25rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin-top: 0.75rem;
+}
+.remark-block h6, .felo-block h6 { font-size: 1.1rem; font-weight: 700; color: #6d28d9; margin-bottom: 0.5rem; }
+.remark-block p, .felo-block p { font-size: 1.05rem; font-style: italic; color: #475569; line-height: 1.5; margin: 0.25rem 0 0; }
+#remark-container, #felo-container { display: none; }
+
+/* 表單 */
+.form-check { margin-bottom: 0.5rem; }
+.form-check-input { margin-right: 0.5rem; }
+.form-check-label { cursor: pointer; }
+
+/* Grid 佈局 */
+.col-12 { width: 100%; }
+.col-md-6 { width: 100%; }
+@media (min-width: 768px) { .col-md-6 { width: 50%; } }
+.row {
+  display: flex; flex-wrap: wrap; gap: 0;
+}
+.row > [class*="col-"] { padding: 0 0.5rem; box-sizing: border-box; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+
+/* ===== 手機版 ===== */
+@media (max-width: 576px) {
+  .section, #question-container, .marquee-border { padding: 1rem; margin-bottom: 1rem; }
+  #question-title { font-size: 1.2rem; }
+  .progress, .timer { font-size: 1rem; padding: 0.5rem; }
+  .chart { height: 15rem; }
+  .btn { width: 100%; margin-bottom: 0.5rem; }
+  .end-test-btn { position: fixed; top: 1rem; right: 1rem; margin-top: 0; z-index: 1000; }
+  .end-test-btn .btn-danger { width: auto; padding: 0.5rem 1rem; }
+  .horizontal-layout { padding-top: 0; }
+  .timer-container { position: relative; top: auto; right: auto; }
+  .timer-container .btn-danger { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+  .nav-buttons { bottom: 0.5rem; gap: 0.5rem; }
+  .nav-buttons .btn-secondary { padding: 0.5rem 1rem; font-size: 0.9rem; }
+  #question-block { padding-top: 0; }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+  body { font-size: 1.15rem; }
+  .section, #question-container { padding: 1.25rem; }
+  .chart { height: 18rem; }
+  .nav-buttons { gap: 1.5rem; }
+}

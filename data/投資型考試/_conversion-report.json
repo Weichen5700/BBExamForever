@@ -1,0 +1,128 @@
+{
+  "summary": {
+    "generatedAt": "2026-04-06T17:52:55.270Z",
+    "category": "投資型考試",
+    "totals": {
+      "files": 2,
+      "questions": 1351,
+      "questionsWithAnswer": 1330,
+      "questionsMissingAnswer": 21
+    }
+  },
+  "files": [
+    {
+      "inputPdf": "input/投資型第一科經典考題_11205.pdf",
+      "className": "第一科",
+      "outputs": {
+        "data": "data/投資型考試/01_第一科經典考題_11205.txt",
+        "sample": "sample/投資型_01_第一科經典考題_11205.txt"
+      },
+      "totals": {
+        "pagesExtracted": 61,
+        "rowsExtracted": 2810,
+        "questionsParsed": 686,
+        "questionsWithAnswer": 678,
+        "questionsMissingAnswer": 8
+      },
+      "missingAnswerSns": [
+        "028",
+        "176",
+        "225",
+        "243",
+        "262",
+        "549",
+        "656",
+        "661"
+      ],
+      "parseWarnings": [],
+      "validation": {
+        "data": {
+          "lineCount": 686,
+          "issueCount": 0,
+          "optionCountHistogram": {
+            "2": 4,
+            "3": 25,
+            "4": 657
+          },
+          "issues": []
+        },
+        "sample": {
+          "lineCount": 686,
+          "issueCount": 0,
+          "optionCountHistogram": {
+            "2": 4,
+            "3": 25,
+            "4": 657
+          },
+          "issues": []
+        }
+      }
+    },
+    {
+      "inputPdf": "input/投資型第二科經典考題11205.pdf",
+      "className": "第二科",
+      "outputs": {
+        "data": "data/投資型考試/02_第二科經典考題_11205.txt",
+        "sample": "sample/投資型_02_第二科經典考題_11205.txt"
+      },
+      "totals": {
+        "pagesExtracted": 48,
+        "rowsExtracted": 2271,
+        "questionsParsed": 665,
+        "questionsWithAnswer": 652,
+        "questionsMissingAnswer": 13
+      },
+      "missingAnswerSns": [
+        "028",
+        "102",
+        "103",
+        "104",
+        "248",
+        "452",
+        "485",
+        "491",
+        "599",
+        "617",
+        "619",
+        "630",
+        "664"
+      ],
+      "parseWarnings": [
+        "[第二科] sn 599 選項過少。",
+        "[第二科] sn 617 選項過少。"
+      ],
+      "validation": {
+        "data": {
+          "lineCount": 665,
+          "issueCount": 2,
+          "optionCountHistogram": {
+            "0": 2,
+            "2": 2,
+            "3": 19,
+            "4": 640,
+            "5": 2
+          },
+          "issues": [
+            "line 599: options 數量過少 (0)",
+            "line 617: options 數量過少 (0)"
+          ]
+        },
+        "sample": {
+          "lineCount": 665,
+          "issueCount": 2,
+          "optionCountHistogram": {
+            "0": 2,
+            "2": 2,
+            "3": 19,
+            "4": 640,
+            "5": 2
+          },
+          "issues": [
+            "line 599: options 數量過少 (0)",
+            "line 617: options 數量過少 (0)"
+          ]
+        }
+      }
+    }
+  ]
+}
